@@ -1,0 +1,43 @@
+get rid of ray start offsetting altogether,
+just check t > TINY instead.
+ 
+grow BoundingBoxes by 1 ulp
+BoundingBox4: intersects_fast: pass inverse ray dir as arg
+
+wavefront_obj: fix normals: disconnect and flip shading if angle with geom > say 30 deg?
+
+1) prove SIMD performance
+   v BB4 = perfect
+   * Face4
+      - f32 first
+	   - f64 for intersecting triangle only
+
+2) cache efficiency
+   * benchmarks for different sizes
+   * compress BB
+   * compress Faces
+
+3) Better tree building
+   * split left-to-right or right-to-left (sort asc. or desc.): measure resulting surface area.
+   * Quad4
+   * Tests that show BB, color faces
+   * Surface area?
+   * Measure and limit depth?
+
+4) Early returns
+   * Enter front branch first
+   * Don't enter if BB fully behind intersection
+
+
+Other:
+  * BB4: do ray dir reciprical once, re-use 4 times
+
+Mesh<Face>, Mesh<Quad> 
+Offset ray for improved t precision
+Hitrecord: store point
+Mesh: Bounding box scaled to size 1, internal coordinates, compress vertices to 16 bit fixed point
+Mesh tree: minimize depth: split to avoid 2*(N+1) children. E.g: 6 -> 2, 4 -> 2, 2, 2. Not: 6 -> 3, 3 -> 1, 2, 1, 2
+Mesh tree: don't split in the middle of num_faces, split in the geometrical middle of the bounding box.
+ui: respect spec view size
+trait Object: intersects()->bool
+Mesh::intersect: bounding boxes: cut ray short at hitrecord.t

@@ -1,0 +1,12 @@
+[package]
+name = "planetarium"
+version = "0.1.0"
+authors = ["Arne Vansteenkiste <barnex@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+brilliance = { path = "../brilliance" }
+
+[[bin]]
+name = "planetarium"
+path = "main.rs"

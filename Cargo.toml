@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "brilliance",
+    "brilliance-ui",
+    "planetarium",
+]
+
+# [profile.release]
+# debug = true
