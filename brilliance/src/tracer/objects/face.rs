@@ -106,7 +106,7 @@ impl Shape for Face {
 		let v = self.attr[0].tex_coords.v_f32() * l1 + self.attr[1].tex_coords.v_f32() * l2 + self.attr[2].tex_coords.v_f32() * l3;
 		let tex_coords = Pointf::new(u, v, 0.0);
 
-		h.update_unchecked(t64, n.into(), shad_norm, tex_coords);
+		h.update_checked(t64, n.into(), shad_norm, tex_coords);
 		true
 	}
 

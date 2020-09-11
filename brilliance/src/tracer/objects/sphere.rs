@@ -44,7 +44,7 @@ impl Shape for Sphere {
 		}
 		if t > 0.0 {
 			let p = r.at(t);
-			let n = (p - self.origin).into();
+			let n = (p - self.origin).normalized().into();
 			return h.update_checked(t, n, n, self.tex_coords(p));
 		}
 		false

@@ -39,8 +39,8 @@ impl<'s> HitRecord<'s> {
 	}
 
 	#[inline]
-	pub fn update_unchecked(&mut self, t: f64, geo_norm: Vectorf, shd_norm: Vectorf, tex_coords: Pointf, mat: &'s dyn Material) {
-		self.coords.update_unchecked(t, geo_norm, shd_norm, tex_coords);
+	pub fn update_unchecked_be_careful(&mut self, t: f64, geo_norm: Vectorf, shd_norm: Vectorf, tex_coords: Pointf, mat: &'s dyn Material) {
+		self.coords.update_unchecked_be_careful(t, geo_norm, shd_norm, tex_coords);
 		self.material = mat;
 	}
 }
@@ -81,7 +81,7 @@ impl HitCoords {
 		debug_assert!(geom_norm.len() > 1e-5);
 		debug_assert!(shad_norm.len() > 1e-5);
 		if t >= 0.0 && t < self.t {
-			self.update_unchecked(t, geom_norm, shad_norm, tex_coords);
+			self.update_unchecked_be_careful(t, geom_norm, shad_norm, tex_coords);
 			true
 		} else {
 			false
@@ -89,7 +89,7 @@ impl HitCoords {
 	}
 
 	#[inline]
-	pub fn update_unchecked(&mut self, t: f64, geom_norm: Vectorf, shad_norm: Vectorf, tex_coords: Pointf) {
+	pub fn update_unchecked_be_careful(&mut self, t: f64, geom_norm: Vectorf, shad_norm: Vectorf, tex_coords: Pointf) {
 		debug_assert!(t >= 0.0);
 		debug_assert!(t < self.t);
 		self.t = t;

@@ -23,7 +23,7 @@ impl Scene {
 		debug_assert!(r.is_valid());
 
 		if depth > self.max_recursion_depth {
-			return Color::BLACK;
+			return self.ambient;
 		}
 
 		let mut h = HitRecord::background(&self.background, r.dir.into());

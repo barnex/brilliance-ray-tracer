@@ -50,7 +50,7 @@ impl Camera {
 	/// Like `look_at2`, but looking into a direction (i.e. independent of camera position)
 	/// rather than to a point (i.e. relative to the camera).
 	pub fn look_dir(self, look_dir: Vector, up: Vector) -> Self {
-		if look_dir.cross(up).len() < 1e-6 {
+		if look_dir.cross(up).len() < 1e-5 * (look_dir.len()) * (up.len()) {
 			panic!(
 				"illegal argument: Camera: look_dir: must not be parallel with up. got: {}, {}",
 				look_dir, up
