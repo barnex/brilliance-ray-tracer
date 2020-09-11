@@ -31,6 +31,10 @@ struct Cli {
 	#[structopt(short, long, default_value = "540")]
 	height: u32,
 
+	/// Background texture (suggested: https://en.wikipedia.org/wiki/Milky_Way#/media/File:ESO_-_Milky_Way.jpg).
+	#[structopt(short, long, default_value = "milkyway.jpg")]
+	background: String,
+
 	/// Only output every nth frame, skip others.
 	#[structopt(short, long, default_value = "1")]
 	every: usize,
@@ -59,8 +63,6 @@ fn main() -> Result<()> {
 		eprintln!("[?] create directory {}: {}", &args.output, e.to_string())
 	}
 
-	let topview = args.topview;
-
 	// read planet positions from file
 	let all_positions = parse_positions_csv(&args.input)?;
 
@@ -72,7 +74,7 @@ fn main() -> Result<()> {
 	let scale_sun = 1.0;
 
 	// Milky way background
-	let backdrop: Arc<dyn Texture> = if topview { Arc::new(BLACK) } else { tex("milkyway.jpg", BLACK) };
+	let backdrop: Arc<dyn Texture> = if args.topview { Arc::new(BLACK) } else { tex(&args.background, BLACK) };
 
 	// Animation: one render per line in the input.
 	for (i, positions) in all_positions.iter().enumerate().step_by(args.every) {
@@ -85,7 +87,7 @@ fn main() -> Result<()> {
 
 		// Add the planets
 		for p in planet_propts.iter() {
-			let diam = if topview { 0.1 } else { 2.0 * p.radius_m * scale_planets / AU };
+			let diam = if args.topview { 0.1 } else { 2.0 * p.radius_m * scale_planets / AU };
 			let pos = positions[p.col] / AU;
 			//dbg!(p.col, pos, diam);
 			objects.push(DynObj::new(Sphere::new(pos, diam).paint(flat(p.texture.clone()))));
@@ -103,7 +105,7 @@ fn main() -> Result<()> {
 		};
 
 		// Set the camera
-		let c = if topview {
+		let c = if args.topview {
 			Camera::pinhole(30.0 * DEG)
 				.at(Point(0.0, 25.0, 0.0))
 				.look_at2(Point(0., 0., 0.), Vector(0.0, 0.0, 1.0))
@@ -122,7 +124,7 @@ fn main() -> Result<()> {
 		let num_cpu = 8;
 		let quality = 98;
 		let img = render(&s, &v, num_cpu);
-		let fname = format!("{}/{:04}.jpg", &args.output, i);
+		let fname = format!("{}{}{:04}.jpg", &args.output, std::path::MAIN_SEPARATOR, i);
 		match save_jpg(&img, &fname, quality) {
 			Ok(()) => Ok(()),
 			Err(e) => error(format!("save {}: {}", &fname, e.to_string())),
