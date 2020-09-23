@@ -1,18 +1,6 @@
 use super::*;
 
-pub trait Light: Send + Sync {
-	// Object is rendered when a viewing ray sees the light directly.
-	// E.g. for a spherical yellow light source, this object is a
-	// bright yellow sphere.
-	//
-	// Care must be taken that the properties of this object
-	// (size, surface brightness) exactly match the light intensity
-	// obtained by calling Sample(). I.e. The amount of light
-	// that a scene receives from this object via unidirectional path
-	// tracing must be exactly equal to the amout of light
-	// received from Sample() using bidirectional path tracing.
-	fn object(&self) -> Option<DynObj>;
-
+pub trait Light: Object {
 	// Return a random point on the light's surface,
 	// and the intensity at given target position.
 	fn sample(&self, rng: &mut Rng, target: Point) -> (Point, Color);
@@ -27,16 +15,27 @@ impl DynLight {
 	{
 		Self(Box::new(light))
 	}
+
+	fn inner(&self) -> &dyn Light {
+		let inner: &dyn Light = self.0.borrow();
+		inner
+	}
+}
+
+impl Bounded for DynLight {
+	fn bounds(&self) -> BoundingBox {
+		self.inner().bounds()
+	}
+}
+
+impl Object for DynLight {
+	fn intersect<'s>(&'s self, r: &Ray, h: &mut HitRecord<'s>) {
+		self.inner().intersect(r, h)
+	}
 }
 
 impl Light for DynLight {
-	fn object(&self) -> Option<DynObj> {
-		let inner: &dyn Light = self.0.borrow();
-		inner.object()
-	}
-
 	fn sample(&self, rng: &mut Rng, target: Point) -> (Point, Color) {
-		let inner: &dyn Light = self.0.borrow();
-		inner.sample(rng, target)
+		self.inner().sample(rng, target)
 	}
 }

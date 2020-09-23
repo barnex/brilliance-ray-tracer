@@ -32,6 +32,19 @@ impl Color {
 		self * f32::powf(2.0, ev as f32)
 	}
 
+	#[inline]
+	pub fn r(self) -> f32 {
+		self[0]
+	}
+	#[inline]
+	pub fn g(self) -> f32 {
+		self[1]
+	}
+	#[inline]
+	pub fn b(self) -> f32 {
+		self[2]
+	}
+
 	/// Convert to 8-bit color, SRGB color space.
 	pub fn srgb(&self) -> RGB {
 		[
@@ -66,6 +79,21 @@ impl Color {
 
 	pub fn is_finite(&self) -> bool {
 		self.0.is_finite()
+	}
+
+	pub fn max(&self) -> f32 {
+		self.0.max3()
+	}
+
+	/// Apply f to each component.
+	///
+	///     use brilliance::*;
+	///     assert_eq!(Color::new(1.0, 2.0, 3.0).apply(|x|x*x), Color::new(1.0, 4.0, 9.0));
+	///
+	#[inline]
+	#[must_use]
+	pub fn apply<F: Fn(f32) -> f32>(&self, f: F) -> Self {
+		Color(self.0.apply(f))
 	}
 
 	pub const BLACK: Color = Color(Vec3 { el: [0., 0., 0.] });

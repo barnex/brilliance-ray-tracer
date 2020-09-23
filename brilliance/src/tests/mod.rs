@@ -5,6 +5,9 @@ pub use super::tracer::*;
 mod camera_tests;
 
 #[cfg(test)]
+mod light_tests;
+
+#[cfg(test)]
 mod tests;
 
 #[cfg(test)]

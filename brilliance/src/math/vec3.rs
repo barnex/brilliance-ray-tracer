@@ -34,6 +34,21 @@ impl<T> Vec3<T> {
 	}
 }
 
+impl<T: Copy> Vec3<T> {
+	/// Apply `f` to each component.
+	///
+	///     use brilliance::*;
+	///     let a = Vec3(1.0, 2.0, 3.0);
+	///     let b = a.apply(|v|v*2.0);
+	///     assert_eq!(b, Vec3(2.0, 4.0, 6.0));
+	///
+	#[inline]
+	#[must_use]
+	pub fn apply<F: Fn(T) -> T>(&self, f: F) -> Self {
+		Self::new(f(self[0]), f(self[1]), f(self[2]))
+	}
+}
+
 impl<T> Vec3<T>
 where
 	T: PartialOrd,

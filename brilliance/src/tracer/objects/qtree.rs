@@ -32,7 +32,8 @@ impl<T: Bounded> QTree<T> {
 		}
 		while bbs.len() < 4 {
 			// an empty box that does not increase the overall size
-			bbs.push(BoundingBox::empty(ch[0].bounds().min))
+			let dummy = ch[0].bounds().min;
+			bbs.push(BoundingBox::new(dummy, dummy))
 		}
 
 		Self {
@@ -91,7 +92,7 @@ impl<T: Bounded> QTree<T> {
 //
 fn bounds_of_centers<T: Bounded>(ch: &[T]) -> BoundingBox {
 	let pt = ch[0].bounds().center();
-	let mut bb = BoundingBox::empty(pt);
+	let mut bb = BoundingBox::new(pt, pt);
 	for ch in ch {
 		bb.add(ch.bounds().center())
 	}

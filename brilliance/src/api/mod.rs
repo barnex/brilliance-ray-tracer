@@ -8,11 +8,9 @@ pub use crate::vec3::*;
 pub use crate::view::View;
 
 pub mod cameras;
-pub mod lights;
 pub mod materials;
 pub mod objects;
 
 pub use cameras::*;
-pub use lights::*;
 pub use materials::*;
 pub use objects::*;

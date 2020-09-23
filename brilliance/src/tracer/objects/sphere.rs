@@ -5,6 +5,10 @@ pub struct Sphere {
 	r2: f64, // radius squared
 }
 
+pub fn sphere(origin: Point, diam: f64) -> Sphere {
+	Sphere::new(origin, diam)
+}
+
 impl Sphere {
 	pub fn new(origin: Point, diam: f64) -> Self {
 		let r = diam / 2.0;

@@ -7,6 +7,11 @@ pub trait Material: Send + Sync {
 	/// Implementations may call s.LightField recursively,
 	/// TODO: recursion depth is limited automatically through the context ctx.
 	fn shade(&self, s: &Scene, r: &Ray, h: &HitCoords, rng: &mut Rng, depth: u32) -> Color;
+
+	// by default, objects are opaque.
+	fn occlude(&self, c: Color, pos: Point) -> Color {
+		Color::BLACK
+	}
 }
 
 pub struct DynMaterial(Box<dyn Material>);

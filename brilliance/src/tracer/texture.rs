@@ -2,6 +2,7 @@ use super::*;
 use std::sync::Arc;
 
 pub trait Texture: Send + Sync + 'static {
+	// + Clone?
 	fn color_at(&self, p: Pointf) -> Color;
 }
 
@@ -13,13 +14,15 @@ impl Texture for Color {
 
 impl Texture for Image<Color> {
 	fn color_at(&self, p: Pointf) -> Color {
-		self.at(nearest(p, self.dimensions()))
+		//self.at(nearest(p, self.dimensions()))
+		bilinear(self, (p[0], p[1]))
 	}
 }
 
 impl Texture for Image<RGB> {
 	fn color_at(&self, p: Pointf) -> Color {
-		self.at(nearest(p, self.dimensions())).into()
+		//self.at(nearest(p, self.dimensions())).into()
+		bilinear(&self, (p[0], p[1]))
 	}
 }
 
@@ -35,6 +38,41 @@ impl Texture for Arc<dyn Texture> {
 		let t: &dyn Texture = self.borrow();
 		t.color_at(p)
 	}
+}
+
+fn bilinear<C: Into<Color> + Copy + Default>(img: &Image<C>, (u, v): (f32, f32)) -> Color {
+	let (w, h) = img.dimensions();
+
+	let X = warp(u) * (w - 1) as f32;
+	let Y = warp(v) * (h - 1) as f32;
+	let x0 = X as u32;
+	let y0 = Y as u32;
+
+	let mut x1 = x0 + 1;
+	if x1 >= w {
+		x1 = 0;
+	}
+	let mut y1 = y0 + 1;
+	if y1 >= h {
+		y1 = 0;
+	}
+	let x = X % 1.0;
+	let y = Y % 1.0;
+
+	let c00: Color = img.at((x0, y0)).into();
+	let c01: Color = img.at((x0, y1)).into();
+	let c10: Color = img.at((x1, y0)).into();
+	let c11: Color = img.at((x1, y1)).into();
+
+	Color::new(
+		bilin(c00.r(), c01.r(), c10.r(), c11.r(), x, y),
+		bilin(c00.g(), c01.g(), c10.g(), c11.g(), x, y),
+		bilin(c00.b(), c01.b(), c10.b(), c11.b(), x, y),
+	)
+}
+
+fn bilin(f00: f32, f01: f32, f10: f32, f11: f32, x: f32, y: f32) -> f32 {
+	f00 * (1.0 - x) * (1.0 - y) + f10 * x * (1.0 - y) + f01 * (1.0 - x) * y + f11 * x * y
 }
 
 fn nearest(p: Pointf, dim: (u32, u32)) -> (u32, u32) {

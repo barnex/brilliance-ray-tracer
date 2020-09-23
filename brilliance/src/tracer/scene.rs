@@ -33,6 +33,11 @@ impl Scene {
 			debug_assert!(h.is_valid());
 		}
 
+		for o in &self.lights {
+			o.intersect(r, &mut h);
+			debug_assert!(h.is_valid());
+		}
+
 		// Object.intersect does not need to normalize normals to unit length,
 		// so do it here.
 		h.coords.geom_normalf.normalize();
@@ -46,7 +51,7 @@ impl Scene {
 	}
 
 	pub fn occlude(&self, r: &Ray, len: f64, orig: Color) -> Color {
-		//TODO: Object: intersects()
+		let mut occluded = orig;
 
 		let background = Flat::new(Color::BLACK);
 		let mut h = HitRecord::background(&background, r.dir.into());
@@ -54,10 +59,13 @@ impl Scene {
 			o.intersect(r, &mut h);
 			debug_assert!(h.is_valid());
 			if h.coords.t < len {
-				return Color::BLACK;
+				occluded = h.material.occlude(occluded, r.at(h.t()));
+				if occluded == Color::BLACK {
+					return occluded;
+				}
 			}
 		}
 
-		orig
+		occluded
 	}
 }
